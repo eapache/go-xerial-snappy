@@ -1,4 +1,7 @@
 # go-xerial-snappy
+
+[![Build Status](https://travis-ci.org/eapache/go-xerial-snappy.svg?branch=master)](https://travis-ci.org/eapache/go-xerial-snappy)
+
 Xerial-compatible Snappy framing support for golang.
 
 Packages using Xerial for snappy encoding use a framing format incompatible with
