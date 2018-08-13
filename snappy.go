@@ -73,7 +73,7 @@ func DecodeInto(dst, src []byte) ([]byte, error) {
 			return nil, ErrMalformed
 		}
 
-		chunk, err = master.Decode(chunk, src[pos:nextPos])
+		chunk, err = master.Decode(chunk[:0], src[pos:nextPos])
 		if err != nil {
 			return nil, err
 		}
