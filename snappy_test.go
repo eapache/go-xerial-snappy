@@ -93,3 +93,70 @@ func TestSnappyMasterDecodeFailed(t *testing.T) {
 		t.Errorf("unexpected err: %v", err)
 	}
 }
+
+
+func BenchmarkSnappyDecode(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		for _, test := range snappyTestCases {
+			_, err := Decode(test)
+			if err != nil {
+				b.Error("Encoding error: ", err)
+			}
+		}
+	}
+}
+
+func BenchmarkSnappyStreamDecode(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		for _, test := range snappyStreamTestCases {
+			_, err := Decode(test)
+			if err != nil {
+				b.Error("Encoding error: ", err)
+			}
+		}
+	}
+}
+
+func BenchmarkSnappyDecodeInto(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	var (
+		dst []byte
+		err error
+	)
+
+	for n := 0; n < b.N; n++ {
+		for _, test := range snappyTestCases {
+			dst, err = DecodeInto(dst, test)
+			if err != nil {
+				b.Error("Encoding error: ", err)
+			}
+		}
+	}
+}
+
+func BenchmarkSnappyStreamDecodeInto(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	var (
+		dst = make([]byte, 1024, 1024)
+		err error
+	)
+
+	for n := 0; n < b.N; n++ {
+		for _, test := range snappyStreamTestCases {
+			dst, err = DecodeInto(dst, test)
+			if err != nil {
+				b.Error("Encoding error: ", err)
+			}
+		}
+	}
+}
