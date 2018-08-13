@@ -32,10 +32,10 @@ func Decode(src []byte) ([]byte, error) {
 }
 
 // DecodeInto decodes snappy data whether it is traditional unframed
-// or includes the xerial framing format into the specified 'dst'.
-// It is assumed that the entirety of dst including all capacity is available
-// for use by this function. If dst is nil *or* insufficiently large to hold
-// the decoded chunks, new chunks will be allocated.
+// or includes the xerial framing format into the specified `dst`.
+// It is assumed that the entirety of `dst` including all capacity is available
+// for use by this function. If `dst` is nil *or* insufficiently large to hold
+// the decoded `src`, new space will be allocated.
 func DecodeInto(dst, src []byte) ([]byte, error) {
 	var max = len(src)
 	if max < len(xerialHeader) {
