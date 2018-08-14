@@ -138,13 +138,15 @@ func BenchmarkSnappyDecode(b *testing.B) {
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
+		bytes := 0
 		for _, test := range snappyTestCases {
 			dst, err := Decode(test)
 			if err != nil {
 				b.Error("Decoding error: ", err)
 			}
-			b.SetBytes(int64(len(dst)))
+			bytes += len(dst)
 		}
+		b.SetBytes(int64(bytes))
 	}
 }
 
@@ -158,13 +160,16 @@ func BenchmarkSnappyDecodeInto(b *testing.B) {
 	)
 
 	for n := 0; n < b.N; n++ {
+		bytes := 0
 		for _, test := range snappyTestCases {
+
 			dst, err = DecodeInto(dst, test)
 			if err != nil {
 				b.Error("Decoding error: ", err)
 			}
-			b.SetBytes(int64(len(dst)))
+			bytes += len(dst)
 		}
+		b.SetBytes(int64(bytes))
 	}
 }
 
@@ -173,13 +178,15 @@ func BenchmarkSnappyStreamDecode(b *testing.B) {
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
+		bytes := 0
 		for _, test := range snappyStreamTestCases {
 			dst, err := Decode(test)
 			if err != nil {
 				b.Error("Decoding error: ", err)
 			}
-			b.SetBytes(int64(len(dst)))
+			bytes += len(dst)
 		}
+		b.SetBytes(int64(bytes))
 	}
 }
 
@@ -193,13 +200,15 @@ func BenchmarkSnappyStreamDecodeInto(b *testing.B) {
 	)
 
 	for n := 0; n < b.N; n++ {
+		bytes := 0
 		for _, test := range snappyStreamTestCases {
 			dst, err = DecodeInto(dst, test)
 			if err != nil {
 				b.Error("Decoding error: ", err)
 			}
-			b.SetBytes(int64(len(dst)))
+			bytes += len(dst)
 		}
+		b.SetBytes(int64(bytes))
 	}
 }
 func BenchmarkSnappyStreamDecodeMassive(b *testing.B) {
@@ -208,13 +217,13 @@ func BenchmarkSnappyStreamDecodeMassive(b *testing.B) {
 
 	b.ReportAllocs()
 	b.ResetTimer()
+	b.SetBytes(int64(len(massiveString)))
 
 	for n := 0; n < b.N; n++ {
-		dst, err := Decode(enc)
+		_, err := Decode(enc)
 		if err != nil {
 			b.Error("Decoding error: ", err)
 		}
-		b.SetBytes(int64(len(dst)))
 	}
 }
 
@@ -224,6 +233,7 @@ func BenchmarkSnappyStreamDecodeIntoMassive(b *testing.B) {
 
 	b.ReportAllocs()
 	b.ResetTimer()
+	b.SetBytes(int64(len(massiveString)))
 
 	var (
 		dst = make([]byte, 1024, 1024)
@@ -235,6 +245,5 @@ func BenchmarkSnappyStreamDecodeIntoMassive(b *testing.B) {
 		if err != nil {
 			b.Error("Decoding error: ", err)
 		}
-		b.SetBytes(int64(len(dst)))
 	}
 }
