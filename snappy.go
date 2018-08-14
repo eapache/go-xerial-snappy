@@ -68,7 +68,6 @@ func EncodeStream(dst, src []byte) []byte {
 		dst = append(dst, chunk...)
 		pos = newPos
 	}
-	workspacePool.Put(chunk)
 	return dst
 }
 
