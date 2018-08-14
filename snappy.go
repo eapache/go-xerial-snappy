@@ -15,14 +15,61 @@ const (
 
 var (
 	xerialHeader = []byte{130, 83, 78, 65, 80, 80, 89, 0}
+
+	// This is xerial version 1 and minimally compatible with version 1
+	xerialVersionInfo = []byte{0, 0, 0, 1, 0, 0, 0, 1}
+
 	// ErrMalformed is returned by the decoder when the xerial framing
 	// is malformed
 	ErrMalformed = errors.New("malformed xerial framing")
 )
 
+func min(x, y int) int {
+    if x < y {
+        return x
+    }
+    return y
+}
+
 // Encode encodes data as snappy with no framing header.
 func Encode(src []byte) []byte {
 	return master.Encode(nil, src)
+}
+
+// EncodeStream *appends* to the specified 'dst' the compressed
+// 'src' in xerial framing format. If 'dst' does not have enough
+// capacity, then a new slice will be allocated. If 'dst' has
+// non-zero length, then if *must* have been built using this function.
+func EncodeStream(dst, src []byte) []byte {
+	if len(dst) == 0 {
+		dst = append(dst, xerialHeader...)
+		dst = append(dst, xerialVersionInfo...)
+	}
+
+	// Snappy encode in blocks of maximum 32KB
+	var (
+		max = len(src)
+		blockSize = 32 * 1024
+		pos   = 0
+		chunk []byte
+	)
+
+	for pos < max {
+		newPos := min(pos + blockSize, max)
+		chunk = master.Encode(chunk[:cap(chunk)], src[pos:newPos])
+
+		// First encode the compressed size (big-endian)
+		// Put* panics if the buffer is too small, so pad 4 bytes first
+		origLen := len(dst)
+		dst = append(dst, dst[0:4]...)
+		binary.BigEndian.PutUint32(dst[origLen:], uint32(len(chunk)))
+
+		// And now the compressed data
+		dst = append(dst, chunk...)
+		pos = newPos
+	}
+	workspacePool.Put(chunk)
+	return dst
 }
 
 // Decode decodes snappy data whether it is traditional unframed
@@ -74,6 +121,7 @@ func DecodeInto(dst, src []byte) ([]byte, error) {
 		}
 
 		chunk, err = master.Decode(chunk[:cap(chunk)], src[pos:nextPos])
+
 		if err != nil {
 			return nil, err
 		}
