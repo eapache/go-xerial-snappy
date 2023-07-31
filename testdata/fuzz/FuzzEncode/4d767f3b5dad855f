@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("m+mbzmZmcy\"CmBmmmXmmm2mBmm)mm&mAXmmmmmmmm'm\"*BmmmC*mmmm9mc+&m.mm%mmmm!mm  mmm0mmmc*!mmB+mX)#'mmm'mmAmmmmmmm9mmm1mc9!9mmmm1m\"Bm#m")
